@@ -28,18 +28,14 @@ void trocar(NO *a, NO *b) {
 
 // Rebalanceia e corrige a fila na hora da insercao
 void fix_up(FILA_PRIORIDADE *fila, int indice){
-    int menor = indice;
+    if(indice == 0) return;
+
     int pai = (indice - 1) / 2;
 
     // Verifica se o pai do no tem menos prioridade que ele
-    if(pai >= 0 && fila->pessoas[pai].prioridade < fila->pessoas[menor].prioridade)
-        menor = pai;
-
-    // Recursao para percorrer toda a heap dessa maneira
-    if(menor != indice)
-    {
-        trocar(&fila->pessoas[indice], &fila->pessoas[menor]);
-        fix_up(fila, menor);
+    if(pai >= 0 && fila->pessoas[pai].prioridade < fila->pessoas[indice].prioridade){
+        trocar(&fila->pessoas[indice], &fila->pessoas[pai]);
+        fix_up(fila, pai);
     }
 }
 
@@ -134,10 +130,12 @@ void fila_printar(FILA_PRIORIDADE *fila){
         printf("Fila está vazia!\n");
         return;
     }
-    
+    // Gera uma tabela com id, nome e prioridade
+    printf("%-10s | %-30s | %-30s\n", "ID", "NOME", "PRIORIDADE");
     for(int i = 0; i < fila->quantNos; i++){
-        printf("Paciente %d: %s\n", i + 1, paciente_get_nome(fila->pessoas[i].paciente));
+        printf("%-10d | %-30s | %-30d\n", paciente_get_id(fila->pessoas[i].paciente), paciente_get_nome(fila->pessoas[i].paciente), fila->pessoas[i].prioridade);
     }
+    printf("\n");
 }
 
 // Libera a fila, mas nao seus pacientes (funcao da relacao de pacientes)

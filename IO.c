@@ -6,7 +6,7 @@
 #define MAX_PROCEDIMENTOS 10
 #define MAX_TAMANHO_FILA 26
 
-bool SAVE(RELACAO_DE_PACIENTE *relacao, FILA_PRIORIDADE *fila) {
+bool SAVE(AVL *relacao, FILA_PRIORIDADE *fila) {
     if (!relacao || !fila) {
         return false;
     }
@@ -97,7 +97,7 @@ bool SAVE(RELACAO_DE_PACIENTE *relacao, FILA_PRIORIDADE *fila) {
     return true;
 }
 
-bool LOAD(RELACAO_DE_PACIENTE **relacao, FILA_PRIORIDADE **fila) {
+bool LOAD(AVL **relacao, FILA_PRIORIDADE **fila) {
     if (!(*relacao) || !(*fila)) {
         return false;
     }
@@ -151,7 +151,7 @@ bool LOAD(RELACAO_DE_PACIENTE **relacao, FILA_PRIORIDADE **fila) {
     int id_fila;
     while (fread(&id_fila, sizeof(int), 1, fp_fila) == 1) {
         // Busca o paciente já carregado na relação
-        PACIENTE *p_encontrado = relacao_registro_busca(*relacao, id_fila);
+        PACIENTE *p_encontrado = avl_registro_busca(*relacao, id_fila);
         if (p_encontrado != NULL) {
             fila_inserir(*fila, p_encontrado);
         }

@@ -96,17 +96,18 @@ void avl_imprimir_aux(NO* no){
 // Função para listar todos os pacientes armazenados na AVL
 void avl_listar_pacientes(AVL *avl){
     if(avl == NULL){
-        printf("AVL inválida.\n");
+        printf("Banco de Dados inválido.\n");
         return;
     }
     if(avl_esta_vazia(avl)){
-        printf("AVL está Vazia!\n");
+        printf("Banco de Dados está Vazio!\n");
         return;
     }
 
     //Cria uma tabela listando todos os pacientes na relacao por ordem de id
     printf("%-10s | %-30s\n", "ID", "NOME");
     avl_imprimir_aux(avl->raiz);
+    printf("\n");
     return;
 }
 

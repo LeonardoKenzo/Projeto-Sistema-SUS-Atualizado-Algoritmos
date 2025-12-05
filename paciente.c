@@ -7,7 +7,7 @@ struct paciente_{
     int id;
     char nome[100];
     HISTORICO *historico;
-    bool estaMorto;
+    bool estaRemovido;
     bool emAtendimento;
 };
 
@@ -20,7 +20,7 @@ PACIENTE *paciente_criar(int id, char *nome){
         paciente->id = id;
         strncpy(paciente->nome, nome, (strlen(nome) + 1));
         paciente->historico = historico_criar();
-        paciente->estaMorto = false;
+        paciente->estaRemovido = false;
         paciente->emAtendimento = false;
 
         return paciente;
@@ -50,21 +50,21 @@ int paciente_get_id(PACIENTE *paciente){
     return -1;
 }
 
-int paciente_get_obito(PACIENTE *paciente){
+int paciente_get_esta_removido(PACIENTE *paciente){
     if(paciente != NULL){
-        return paciente->estaMorto;
+        return paciente->estaRemovido;
     }
     return -1;
 }
 
-bool paciente_registrar_obito(PACIENTE *paciente){
-    if(paciente != NULL && paciente->emAtendimento && paciente->estaMorto == false){
-        paciente->estaMorto = true;
+bool paciente_remover(PACIENTE *paciente){
+    if(paciente != NULL && paciente->emAtendimento && paciente->estaRemovido == false){
+        paciente->estaRemovido = true;
         paciente->emAtendimento = false;
         printf("Óbito do paciente %s registrado.\n", paciente->nome);
         return true;
     }
-    else if(paciente != NULL && paciente->estaMorto){
+    else if(paciente != NULL && paciente->estaRemovido){
         printf("O paciente %s já tem registro de óbito.\n", paciente->nome);
         return false;
     }
@@ -83,14 +83,14 @@ int paciente_get_atendimento(PACIENTE *paciente){
 }
 
 void paciente_em_atendimento(PACIENTE *paciente){
-    if(paciente != NULL && paciente->emAtendimento == false && paciente->estaMorto == false){
+    if(paciente != NULL && paciente->emAtendimento == false && paciente->estaRemovido == false){
         paciente->emAtendimento = true;
         printf("Paciente %s em atendimento.\n", paciente->nome);
     }
     else if(paciente != NULL && paciente->emAtendimento){
         printf("O paciente %s já está em atendimento.\n", paciente->nome);
     }
-    else if(paciente != NULL && paciente->estaMorto){
+    else if(paciente != NULL && paciente->estaRemovido){
         printf("O paciente %s tem registro de óbito e não pode ser atendido.\n", paciente->nome);
     }
 }
