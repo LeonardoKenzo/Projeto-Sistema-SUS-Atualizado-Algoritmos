@@ -3,7 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "paciente.h"
-#include "fila_de_atendimento.h"
+#include "fila_por_prioridade.h"
 #include "relacao_de_pacientes.h"
 #include "IO.h"
 #define TAM_FILA 26
@@ -11,17 +11,17 @@
 PACIENTE *ler_paciente(RELACAO_DE_PACIENTE *relacao);
 PACIENTE *buscar_paciente(RELACAO_DE_PACIENTE *relacao);
 bool ler_verificar_numero(int *saida);
-void registrar_paciente(RELACAO_DE_PACIENTE *relacao, FILA_DE_ATENDIMENTO *fila, PACIENTE *novoPaciente);
+void registrar_paciente(RELACAO_DE_PACIENTE *relacao, FILA_PRIORIDADE *fila, PACIENTE *novoPaciente);
 void registrar_obito(RELACAO_DE_PACIENTE *relacao);
 void adicionar_procedimento(RELACAO_DE_PACIENTE *relacao);
 void desfazer_procedimento(RELACAO_DE_PACIENTE *relacao);
-void chamar_paciente_atendimento(FILA_DE_ATENDIMENTO *fila);
+void chamar_paciente_atendimento(FILA_PRIORIDADE *fila);
 void mostrar_historico(RELACAO_DE_PACIENTE *relacao);
 void printar_menu();
 
 int main(void){
     RELACAO_DE_PACIENTE *relacao = relacao_criar();
-    FILA_DE_ATENDIMENTO *fila = fila_criar(TAM_FILA);
+    FILA_PRIORIDADE *fila = fila_criar(TAM_FILA);
 
     //CARREGAR RELAÇÃO E FILA DE EXECUÇÕES ANTERIORES
     if (LOAD(&relacao, &fila)== false){
@@ -115,7 +115,7 @@ PACIENTE *ler_paciente(RELACAO_DE_PACIENTE *relacao){
     return novoPaciente;
 }
 
-void registrar_paciente(RELACAO_DE_PACIENTE *relacao, FILA_DE_ATENDIMENTO *fila, PACIENTE *novoPaciente){
+void registrar_paciente(RELACAO_DE_PACIENTE *relacao, FILA_PRIORIDADE *fila, PACIENTE *novoPaciente){
     //Se nao foi possivel inserir o paciente no registro libera memoria
     if(!relacao_inserir_paciente(relacao, novoPaciente)){
         paciente_free(&novoPaciente);
@@ -165,7 +165,7 @@ void desfazer_procedimento(RELACAO_DE_PACIENTE *relacao){
     printf("\n");
 }
 
-void chamar_paciente_atendimento(FILA_DE_ATENDIMENTO *fila){
+void chamar_paciente_atendimento(FILA_PRIORIDADE *fila){
     //Retira o paciente da fila de atendimento
     PACIENTE *paciente = fila_remover(fila);
     if(paciente == NULL){

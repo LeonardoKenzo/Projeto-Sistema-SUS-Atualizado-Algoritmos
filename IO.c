@@ -6,7 +6,7 @@
 #define MAX_PROCEDIMENTOS 10
 #define MAX_TAMANHO_FILA 26
 
-bool SAVE(RELACAO_DE_PACIENTE *relacao, FILA_DE_ATENDIMENTO *fila) {
+bool SAVE(RELACAO_DE_PACIENTE *relacao, FILA_PRIORIDADE *fila) {
     if (!relacao || !fila) {
         return false;
     }
@@ -15,7 +15,7 @@ bool SAVE(RELACAO_DE_PACIENTE *relacao, FILA_DE_ATENDIMENTO *fila) {
     PACIENTE *pacientes_na_fila[MAX_TAMANHO_FILA];
     int contador_fila = 0;
 
-    FILE *fp_fila = fopen("fila_atendimento.bin", "wb");
+    FILE *fp_fila = fopen("fila_prioridade.bin", "wb");
     if (!fp_fila) {
         return false;
     }
@@ -97,7 +97,7 @@ bool SAVE(RELACAO_DE_PACIENTE *relacao, FILA_DE_ATENDIMENTO *fila) {
     return true;
 }
 
-bool LOAD(RELACAO_DE_PACIENTE **relacao, FILA_DE_ATENDIMENTO **fila) {
+bool LOAD(RELACAO_DE_PACIENTE **relacao, FILA_PRIORIDADE **fila) {
     if (!(*relacao) || !(*fila)) {
         return false;
     }
@@ -142,7 +142,7 @@ bool LOAD(RELACAO_DE_PACIENTE **relacao, FILA_DE_ATENDIMENTO **fila) {
     fclose(fp_relacao);
 
     //Carregando a fila de atendimento
-    FILE *fp_fila = fopen("fila_atendimento.bin", "rb");
+    FILE *fp_fila = fopen("fila_prioridade.bin", "rb");
     if (!fp_fila) {
         // Se o arquivo não existe, pode ser a primeira execução. Retorna true com estruturas vazias.
         return true;
