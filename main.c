@@ -35,8 +35,8 @@ int main(void){
             printar_menu();
         }while(!ler_verificar_numero(&comando));
 
-        //Garante que o comando esteja entre 1 e 9
-        if(comando < 1 || comando > 9)
+        //Garante que o comando esteja entre 1 e 10
+        if(comando < 1 || comando > 10)
             printf("Selecione um comando válido.\n\n");
         
         switch (comando)
@@ -49,27 +49,31 @@ int main(void){
         case 2: //Remover paciente
             remover_paciente(relacao);
             break;
-        case 3: //Adicionar procedimento ao historico medico
+        case 3: // Buscar paciente por ID
+            PACIENTE *paciente = buscar_paciente(relacao);
+            printf("Paciente: %s. ID: %d.\n\n", paciente_get_nome(paciente), paciente_get_id(paciente));
+            break;
+        case 4: //Adicionar procedimento ao historico medico
             adicionar_procedimento(relacao);
             break;
-        case 4: //Desfazer procedimento do historico medico
+        case 5: //Desfazer procedimento do historico medico
             desfazer_procedimento(relacao);
             break;
-        case 5: //Dar alta ao paciente
+        case 6: //Dar alta ao paciente
             chamar_paciente_atendimento(fila);
             break;
-        case 6: //Mostrar fila de espera
+        case 7: //Mostrar fila de espera
             fila_printar(fila);
             printf("\n");
             break;
-        case 7: //Mostrar historico do paciente
+        case 8: //Mostrar historico do paciente
             mostrar_historico(relacao);
             break;
-        case 8: // Listar todos os pacientes no registro
+        case 9: // Listar todos os pacientes no registro
             avl_listar_pacientes(relacao);
             break;
         }
-    }while(comando != 9);
+    }while(comando != 10);
 
     //SALVAR RELAÇÂO E FILA
     if(SAVE(relacao, fila)==false){
@@ -87,13 +91,14 @@ void printar_menu(){
     printf("Selecione o Comando:\n");
     printf("1. Registrar paciente.\n");
     printf("2. Remover paciente.\n");
-    printf("3. Adicionar procedimento ao histórico médico.\n");
-    printf("4. Desfazer procedimento do histórico médico.\n");
-    printf("5. Dar alta ao paciente.\n");
-    printf("6. Mostrar fila de espera.\n");
-    printf("7. Mostrar histórico do paciente.\n");
-    printf("8. Listar pacientes.\n");
-    printf("9. Sair.\n");
+    printf("3. Buscar paciente por ID.\n");
+    printf("4. Adicionar procedimento ao histórico médico.\n");
+    printf("5. Desfazer procedimento do histórico médico.\n");
+    printf("6. Dar alta ao paciente.\n");
+    printf("7. Mostrar fila de espera.\n");
+    printf("8. Mostrar histórico do paciente.\n");
+    printf("9. Listar pacientes.\n");
+    printf("10. Sair.\n");
 }
 
 PACIENTE *ler_paciente(AVL *relacao, int *prioridade){
