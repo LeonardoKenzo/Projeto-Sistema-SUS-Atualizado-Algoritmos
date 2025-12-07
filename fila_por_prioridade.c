@@ -33,7 +33,7 @@ void fix_up(FILA_PRIORIDADE *fila, int indice){
     int pai = (indice - 1) / 2;
 
     // Verifica se o pai do no tem menos prioridade que ele
-    if(pai >= 0 && fila->pessoas[pai].prioridade < fila->pessoas[indice].prioridade){
+    if(pai >= 0 && fila->pessoas[pai].prioridade > fila->pessoas[indice].prioridade){
         trocar(&fila->pessoas[indice], &fila->pessoas[pai]);
         fix_up(fila, pai);
     }
@@ -46,10 +46,10 @@ void fix_down(FILA_PRIORIDADE *fila, int indice){
     int filhoDireita = indice * 2 + 2;
 
     // Compara se os filhos do no sao maiores que ele mesmo, se sim troca, se nao mantem.
-    if(filhoEsquerda <= fila->quantNos && fila->pessoas[filhoEsquerda].prioridade >= fila->pessoas[maior].prioridade)
+    if(filhoEsquerda <= fila->quantNos && fila->pessoas[filhoEsquerda].prioridade <= fila->pessoas[maior].prioridade)
         maior = filhoEsquerda;
 
-    if(filhoDireita <= fila->quantNos && fila->pessoas[filhoDireita].prioridade >= fila->pessoas[maior].prioridade)
+    if(filhoDireita <= fila->quantNos && fila->pessoas[filhoDireita].prioridade <= fila->pessoas[maior].prioridade)
         maior = filhoDireita;
 
     // Recursao para percorrer toda a heap dessa maneira
@@ -105,13 +105,14 @@ PACIENTE *fila_remover(FILA_PRIORIDADE *fila){
 bool fila_inserir(FILA_PRIORIDADE *fila, PACIENTE *paciente, int prioridade){
    if(fila_cheia(fila) || fila == NULL) return false;
 
+   int indice = fila->quantNos;
    // Adicionar na Heap o paciente com sua respectiva prioridade
    fila->pessoas[fila->quantNos].paciente = paciente;
    fila->pessoas[fila->quantNos].prioridade = prioridade;
+   fila->quantNos++;
 
    // Rebalanceia e corrige a Heap
-   fix_up(fila, fila->quantNos);
-   fila->quantNos++;
+   fix_up(fila, indice);
 
    return true;
 }
@@ -124,18 +125,48 @@ bool fila_vazia(FILA_PRIORIDADE *fila){
     return (fila->quantNos == 0);
 }
 
+int fila_get_prioridade(FILA_PRIORIDADE *fila){
+    if(fila_vazia(fila)) return -1;
+
+    int prioridade = fila->pessoas[0].prioridade;
+
+    return prioridade;
+}
+
 // Printa toda a fila
-void fila_printar(FILA_PRIORIDADE *fila){
-    if(fila_vazia(fila)){
-        printf("Fila está vazia!\n");
+void fila_printar(FILA_PRIORIDADE *fila) {
+    if (fila == NULL || fila->quantNos == 0) {
+        printf("Fila vazia!\n");
         return;
     }
-    // Gera uma tabela com id, nome e prioridade
-    printf("%-10s | %-30s | %-30s\n", "ID", "NOME", "PRIORIDADE");
-    for(int i = 0; i < fila->quantNos; i++){
-        printf("%-10d | %-30s | %-30d\n", paciente_get_id(fila->pessoas[i].paciente), paciente_get_nome(fila->pessoas[i].paciente), fila->pessoas[i].prioridade);
+    
+    // Criar cópia temporária
+    FILA_PRIORIDADE *copia = fila_criar(fila->capacidade);
+    if (copia == NULL) {
+        printf("Erro ao criar cópia!\n");
+        return;
     }
-    printf("\n");
+    
+    // Copiar todos os elementos
+    for (int i = 0; i < fila->quantNos; i++) {
+        copia->pessoas[i] = fila->pessoas[i];
+    }
+    copia->quantNos = fila->quantNos;
+    
+    printf("%-10s | %-20s | %-20s\n", "ID", "NOME", "PRIORIDADE");
+    
+    // Remover da cópia (não afeta a original)
+    while (copia->quantNos > 0) {
+        printf("%-10d | %-20s | %-20d\n",
+             paciente_get_id(copia->pessoas[0].paciente), 
+             paciente_get_nome(copia->pessoas[0].paciente), 
+             copia->pessoas[0].prioridade);
+
+        // Remove o primeiro
+        fila_remover(copia);
+    }
+    
+    fila_free(&copia);
 }
 
 // Libera a fila, mas nao seus pacientes (funcao da relacao de pacientes)

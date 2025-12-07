@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "avl.h"
 
 #define max(a,b) ((a > b) ? a : b)
@@ -64,7 +65,7 @@ void avl_apagar_nos(NO* raiz){
 
 // Função para apagar a AVL
 void avl_free(AVL** avl){
-    if (*avl == NULL || avl == NULL){
+    if (avl == NULL || *avl == NULL){
         return;
     }
     avl_apagar_nos((*avl)->raiz);
@@ -315,4 +316,59 @@ NO* avl_remover_aux(NO* raiz, int id){
         }
     }
     return raiz;
+}
+
+// Função auxiliar recursiva para salvar
+void avl_salvar_aux(NO *raiz, FILE *fp) {
+    if (raiz == NULL) {
+        return;
+    }
+    
+    // Percorre esquerda
+    avl_salvar_aux(raiz->esquerdo, fp);
+    
+    // Processa nó atual (salva no arquivo)
+    PACIENTE *p = raiz->paciente;
+    
+    // Salvar ID
+    int id = paciente_get_id(p);
+    fwrite(&id, sizeof(int), 1, fp);
+
+    // Salvar Nome
+    char *nome = paciente_get_nome(p);
+    int tam_nome = strlen(nome);
+    fwrite(&tam_nome, sizeof(int), 1, fp);
+    fwrite(nome, sizeof(char), tam_nome, fp);
+
+    // Salvando o histórico do paciente
+    HISTORICO *hist = paciente_get_historico(p);
+    char *procedimentos[10];
+    int count_procedimentos = 0;
+
+    while (!historico_esta_vazio(hist) && count_procedimentos < 10) {
+        char *proc_topo = historico_consultar_procedimento_topo(hist); 
+        procedimentos[count_procedimentos] = strdup(proc_topo);
+        historico_remover_procedimento(hist);
+        count_procedimentos++;
+    }
+    
+    fwrite(&count_procedimentos, sizeof(int), 1, fp);
+
+    for (int i = count_procedimentos - 1; i >= 0; i--) {
+        int tam_proc = strlen(procedimentos[i]);
+        fwrite(&tam_proc, sizeof(int), 1, fp);
+        fwrite(procedimentos[i], sizeof(char), tam_proc, fp);
+        free(procedimentos[i]);
+    }
+    
+    // Percorre direita
+    avl_salvar_aux(raiz->direito, fp);
+}
+
+// Função principal
+void avl_salvar_pacientes(AVL *avl, FILE *fp) {
+    if (avl == NULL || fp == NULL) {
+        return;
+    }
+    avl_salvar_aux(avl->raiz, fp);
 }

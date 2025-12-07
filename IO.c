@@ -4,7 +4,7 @@
 #include <string.h>
 
 #define MAX_PROCEDIMENTOS 10
-#define MAX_TAMANHO_FILA 26
+#define MAX_TAMANHO_FILA 30
 
 bool SAVE(AVL *relacao, FILA_PRIORIDADE *fila) {
     if (!relacao || !fila) {
@@ -13,6 +13,7 @@ bool SAVE(AVL *relacao, FILA_PRIORIDADE *fila) {
 
     // Array temporário para guardar os ponteiros dos pacientes da fila
     PACIENTE *pacientes_na_fila[MAX_TAMANHO_FILA];
+    int prioridade_na_fila[MAX_TAMANHO_FILA];
     int contador_fila = 0;
 
     FILE *fp_fila = fopen("fila_prioridade.bin", "wb");
@@ -20,24 +21,30 @@ bool SAVE(AVL *relacao, FILA_PRIORIDADE *fila) {
         return false;
     }
 
-    //Esvazia a fila, salvando os IDs no arquivo e os ponteiros no array
+    //Esvazia a fila, salvando os IDs no arquivo e os pacientes e suas prioridades no array
+    int prioridade = fila_get_prioridade(fila);
     PACIENTE *p_fila = fila_remover(fila);
     while (p_fila != NULL) {
         // Salva o ID
         int id = paciente_get_id(p_fila);
         fwrite(&id, sizeof(int), 1, fp_fila);
+        fwrite(&prioridade, sizeof(int), 1, fp_fila);
 
-        // Guarda o ponteiro no array temporário
+        // Guarda o paciente no array temporário
         pacientes_na_fila[contador_fila] = p_fila;
-        contador_fila++;
-
+        
+        // Salva a prioridade do paciente no array temporario
+        prioridade_na_fila[contador_fila] = prioridade;
+        
+        prioridade = fila_get_prioridade(fila);
         p_fila = fila_remover(fila);
+        contador_fila++;
     }
     fclose(fp_fila);
 
     //Reconstrói a fila a partir do array temporário para liberar depois
     for (int i = 0; i < contador_fila; i++) {
-        fila_inserir(fila, pacientes_na_fila[i]);
+        fila_inserir(fila, pacientes_na_fila[i], prioridade_na_fila[i]);
     }
 
     //Salvar a relação de pacientes
@@ -47,51 +54,8 @@ bool SAVE(AVL *relacao, FILA_PRIORIDADE *fila) {
     }
 
     //Salvando a Relação de Pacientes
-    PACIENTE *p = relacao_remover_paciente_fim(relacao);
-    while (p != NULL) {
-        // Salvar ID
-        int id = paciente_get_id(p);
-        fwrite(&id, sizeof(int), 1, fp_relacao);
+    avl_salvar_pacientes(relacao, fp_relacao);
 
-        // Salvar Nome (comprimento + string)
-        char *nome = paciente_get_nome(p);
-        int tam_nome = strlen(nome);
-        fwrite(&tam_nome, sizeof(int), 1, fp_relacao);
-        fwrite(nome, sizeof(char), tam_nome, fp_relacao);
-
-        //Salvando o histórico do paciente
-        HISTORICO *hist = paciente_get_historico(p);
-        char *procedimentos[MAX_PROCEDIMENTOS];
-        int count_procedimentos = 0;
-
-        // Esvazia o histórico guardando os procedimentos temporariamente
-        while (!historico_esta_vazio(hist) && count_procedimentos < MAX_PROCEDIMENTOS) {
-            
-            // Pega o procedimento do topo
-            char *proc_topo = historico_consultar_procedimento_topo(hist); 
-
-            // Copia a string para o array temporário
-            procedimentos[count_procedimentos] = strdup(proc_topo);
-
-            // Remove o procedimento do histórico
-            historico_remover_procedimento(hist);
-
-            count_procedimentos++;
-        }
-        
-        // Escreve a quantidade de procedimentos no arquivo
-        fwrite(&count_procedimentos, sizeof(int), 1, fp_relacao);
-
-        // Escreve cada procedimento (em ordem inversa / base para o topo)
-        for (int i = count_procedimentos - 1; i >= 0; i--) {
-            int tam_proc = strlen(procedimentos[i]);
-            fwrite(&tam_proc, sizeof(int), 1, fp_relacao);
-            fwrite(procedimentos[i], sizeof(char), tam_proc, fp_relacao);
-            free(procedimentos[i]);
-        }
-        paciente_free(&p);
-        p = relacao_remover_paciente_fim(relacao);
-    }
     fclose(fp_relacao);
 
     return true;
@@ -137,7 +101,7 @@ bool LOAD(AVL **relacao, FILA_PRIORIDADE **fila) {
             free(procedimento);
         }
 
-        relacao_inserir_paciente(*relacao, p);
+        avl_inserir_paciente(*relacao, p);
     }
     fclose(fp_relacao);
 
@@ -148,15 +112,22 @@ bool LOAD(AVL **relacao, FILA_PRIORIDADE **fila) {
         return true;
     }
 
-    int id_fila;
+    int id_fila, prioridade;
     while (fread(&id_fila, sizeof(int), 1, fp_fila) == 1) {
+        if (fread(&prioridade, sizeof(int), 1, fp_fila) != 1) {
+            fclose(fp_fila);
+            return false;
+        }
+
         // Busca o paciente já carregado na relação
         PACIENTE *p_encontrado = avl_registro_busca(*relacao, id_fila);
         if (p_encontrado != NULL) {
-            fila_inserir(*fila, p_encontrado);
+            fila_inserir(*fila, p_encontrado, prioridade);
         }
     }
     fclose(fp_fila);
 
     return true;
 }
+
+

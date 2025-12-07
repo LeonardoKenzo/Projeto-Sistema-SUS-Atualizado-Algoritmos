@@ -61,15 +61,15 @@ bool paciente_remover(PACIENTE *paciente){
     if(paciente != NULL && paciente->emAtendimento && paciente->estaRemovido == false){
         paciente->estaRemovido = true;
         paciente->emAtendimento = false;
-        printf("Óbito do paciente %s registrado.\n", paciente->nome);
+        printf("Remoção do paciente %s registrado.\n\n", paciente->nome);
         return true;
     }
     else if(paciente != NULL && paciente->estaRemovido){
-        printf("O paciente %s já tem registro de óbito.\n", paciente->nome);
+        printf("O paciente %s já foi removido.\n\n", paciente->nome);
         return false;
     }
     else if(paciente != NULL && paciente->emAtendimento == false){
-        printf("Registro de óbito para o paciente %s falhou.\n", paciente->nome);
+        printf("Remoção do paciente %s falhou (não pode estar na fila de atendimento).\n\n", paciente->nome);
         return false;
     }
     return false;
@@ -91,7 +91,7 @@ void paciente_em_atendimento(PACIENTE *paciente){
         printf("O paciente %s já está em atendimento.\n", paciente->nome);
     }
     else if(paciente != NULL && paciente->estaRemovido){
-        printf("O paciente %s tem registro de óbito e não pode ser atendido.\n", paciente->nome);
+        printf("O paciente %s foi removido dos registros e não pode ser atendido.\n", paciente->nome);
     }
 }
 

@@ -9,6 +9,7 @@
     bool fila_inserir(FILA_PRIORIDADE *fila, PACIENTE *paciente, int prioridade);
     bool fila_cheia(FILA_PRIORIDADE *fila);
     bool fila_vazia(FILA_PRIORIDADE *fila);
+    int fila_get_prioridade(FILA_PRIORIDADE *fila);
     void fila_printar(FILA_PRIORIDADE *fila);
     void fila_free(FILA_PRIORIDADE **fila);
 

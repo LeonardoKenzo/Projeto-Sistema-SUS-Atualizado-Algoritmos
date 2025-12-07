@@ -24,9 +24,9 @@ int main(void){
     FILA_PRIORIDADE *fila = fila_criar(TAM_FILA);
 
     //CARREGAR RELAÇÃO E FILA DE EXECUÇÕES ANTERIORES
-    // if (LOAD(&relacao, &fila)== false){
-    //     printf("Não foi possível acessar o arquivo binário para LOAD\n");
-    // }
+    if (LOAD(&relacao, &fila)== false){
+        printf("Não foi possível acessar o arquivo binário para LOAD\n");
+    }
 
     int comando;
     do{
@@ -72,9 +72,9 @@ int main(void){
     }while(comando != 9);
 
     //SALVAR RELAÇÂO E FILA
-    // if(SAVE(relacao, fila)==false){
-    //     printf("Não foi possível acessar o arquivo binário para o SAVE\n");
-    // }
+    if(SAVE(relacao, fila)==false){
+        printf("Não foi possível acessar o arquivo binário para o SAVE\n");
+    }
 
     //LIBERAR MEMORIA
     fila_free(&fila);
@@ -172,6 +172,7 @@ void desfazer_procedimento(AVL *relacao){
     printf("Paciente: %s\n", paciente_get_nome(paciente));
     char * procedimento = historico_consultar_procedimento_topo(paciente_get_historico(paciente));
     if(procedimento == NULL){
+        printf("Não tem procedimentos inseridos.\n\n");
         return;
     }
     historico_remover_procedimento(paciente_get_historico(paciente));
