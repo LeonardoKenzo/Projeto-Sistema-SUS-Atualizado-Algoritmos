@@ -86,10 +86,18 @@ bool avl_esta_vazia(AVL* avl){
 void avl_imprimir_aux(NO* no){
     if(no != NULL){
         avl_imprimir_aux(no->esquerdo);
+
         PACIENTE *p = no->paciente;
         int id = paciente_get_id(p);
         char *nome = paciente_get_nome(p);
-        printf("%-10d | %-30s\n", id, nome);
+        HISTORICO *h = paciente_get_historico(p);
+
+        printf("------------------------------------------------------------\n");
+        printf("ID: %-6d | PACIENTE: %s\n", id, nome);
+        printf("------------------------------------------------------------\n");
+        printf("HISTÓRICO DE PROCEDIMENTOS:\n");
+        historico_printar(h);
+        printf("\n");
         avl_imprimir_aux(no->direito);
     }
 }
@@ -106,7 +114,6 @@ void avl_listar_pacientes(AVL *avl){
     }
 
     //Cria uma tabela listando todos os pacientes na relacao por ordem de id
-    printf("%-10s | %-30s\n", "ID", "NOME");
     avl_imprimir_aux(avl->raiz);
     printf("\n");
     return;
